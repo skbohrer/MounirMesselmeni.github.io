@@ -375,6 +375,6 @@ It shows that the proportion of interest in different massaging systems was appr
 
 ## Conclusion
 
-1. RabbitMQ and ActiveMQ are very popular. If you choose one of them for your messaging infrastructure, you shouldn't have any problem with the community support. HornetQ might be a good message broker but it definitely lacks the community interest. Finally, as I [suspected](/2012/11/12/pycon-canada-2012.html#learn) before, ZeroMQ is worth looking at. There are bunch of smart and helpful people in ZeroMQ community.
+1. RabbitMQ and ActiveMQ are very popular. If you choose one of them for your messaging infrastructure, you shouldn't have any problem with the community support. HornetQ might be a good message broker but it definitely lacks the community interest. Finally, as I [suspected](/2012/11/12/pycon-canada-2012/#learn) before, ZeroMQ is worth looking at. There are bunch of smart and helpful people in ZeroMQ community.
 
 2. MongoDB is really nice! Its aggregation framework is powerful and easy to use. It was fun playing with it.
