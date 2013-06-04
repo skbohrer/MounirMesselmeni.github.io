@@ -14,7 +14,7 @@ Before installing ejabberd make sure you have Erlang environment set up. Run the
     $ erl -version
     Erlang (ASYNC_THREADS,HIPE) (BEAM) emulator version 5.10.1
 
-I used to install ejabberd with apt-get command, which is convenient but always several versions behind. That's why I switched to building from sources. All scripts below should be run under *ejabberd* user.
+I used to install ejabberd with apt-get command, which is convenient but always several versions behind. That's why I switched to building from sources. All scripts below are assumed to be run under *ejabberd* user.
 
 First, create a directory where all ejabberd versions will be installed, if it does not exist yet
 
@@ -23,17 +23,23 @@ First, create a directory where all ejabberd versions will be installed, if it d
 
 Download the sources
 
+    $ cd
     $ git clone git@github.com:processone/ejabberd.git
     $ cd ejabberd
 
-Assuming we want to install version 2.1.x
+Select version you want to install by executing `git branch -a` and `git tag --list` commands. Let assume we want to install version 2.1.12 from branch 2.1.x
 
     $ git checkout 2.1.x
     $ cd src
+
+The next step is optional. If you are going to integrate ejabberd with RabbitMQ, you need to download the source of rabbitmq-xmpp module
+
+    $ wget https://raw.github.com/ndpar/rabbitmq-xmpp/rabbitmq3/src/mod_rabbitmq.erl
+    $ wget https://raw.github.com/ndpar/rabbitmq-xmpp/rabbitmq3/src/rabbit.hrl
+
+Now we are ready to install ejabberd. To see all available configuration options, run `./configure --help`.
+
     $ ./configure --prefix=/opt/ejabberd/ejabberd-2.1.12 --enable-user=ejabberd
-
-To see all available options, run `./configure --help`.
-
     $ make
     $ make install
     $ cd /opt/ejabberd
@@ -41,29 +47,46 @@ To see all available options, run `./configure --help`.
 
 ## Configuration
 
-Ejabberd comes with reasonable default configuration. Only two lines of configuration need to be changed to make it work in your environment. Open */opt/ejabberd/ejabberd/etc/ejabberd/ejabberd.cfg* file and find *SERVED HOSTNAMES* section. By default Ejabberd listens to localhost only. Update this line with your machine's host names. I usually add the short name and the long name. You can find them by running `hostname -s` and `hostname -A` commands. Here is what I have in my config
+Ejabberd comes with reasonable default configuration. Only two lines need to be changed to make it work in your environment.
+
+Open */opt/ejabberd/ejabberd/etc/ejabberd/ejabberd.cfg* file and find *SERVED HOSTNAMES* section. By default Ejabberd is configured for localhost only. Change it to your machine's DNS name. Here is what I have in my config
 
 {% codeblock /opt/ejabberd/ejabberd/etc/ejabberd/ejabberd.cfg lang:erlang %}
 %%%'   SERVED HOSTNAMES
-{hosts, ["localhost", "ubuntu", "jabber.ndpar.com"]}.
+{hosts, ["jabber.ndpar.com"]}.
 {% endcodeblock %}
 
-The second thing we need to do is to configure admin user. Here is mine
+The second thing we need to do is to configure admin user. Here is mine, registered for the host I just defined
 
 {% codeblock /opt/ejabberd/ejabberd/etc/ejabberd/ejabberd.cfg lang:erlang %}
 %%%'   ACCESS CONTROL LISTS
 {acl, admin, {user, "andrey", "jabber.ndpar.com"}}.
 {% endcodeblock %}
 
-After these two changes are done, start the server
+Save the config file and start the server
 
-    $ cd /opt/ejabberd/ejabberd/sbin
-    $ ./ejabberdctl start
+    $ /opt/ejabberd/ejabberd/sbin/ejabberdctl start
+
+You can quickly check the log file to see if the server has been started successfully
+
+    $ less /opt/ejabberd/ejabberd/var/log/ejabberd/ejabberd.log
+
+If it wasn't, you might want to enable debug logs
+
+{% codeblock /opt/ejabberd/ejabberd/etc/ejabberd/ejabberd.cfg lang:erlang %}
+%%%'   DEBUGGING
+{loglevel, 5}.
+{% endcodeblock %}
+
+and restart the server to see more details
+
+    $ /opt/ejabberd/ejabberd/sbin/ejabberdctl restart
 
 ## Registering users
 
 The first (admin) user has to be registered in command line
 
+    $ cd /opt/ejabberd/ejabberd/sbin
     $ ./ejabberdctl register andrey jabber.ndpar.com ******
 
 This user is the same as admin you configured in the previous section. If you go to [localhost:5280/admin](http://localhost:5280/admin) in the browser, you should be able to login with the same password you registered the user
@@ -76,6 +99,11 @@ Now you are ready to add newly created account to your Jabber client. In Adium, 
 
 {% img center /images/posts/ejabberd-adium-2.png %}
 
-To really enjoy IM you need more users on your server. The best part here is that you can create new users just from your Jabber client. You can actually do many things from the client, and you don't need to ssh to the remote server and run command for that. Just go to *File* -> *your ejabberd account*, and chose whatever you need from the menu
+To really enjoy IM you need more users on your server. The best part here is that you can create new users just from your Jabber client. Simply go to *File* -> *your ejabberd account* -> *Add User*
 
 {% img center /images/posts/ejabberd-admin-client.png %}
+
+For other available options please consult [official documentation][1].
+
+
+[1]: http://www.ejabberd.im
