@@ -32,85 +32,97 @@ Did you notice the concept of "save queue"? That's what many people are not awar
 
 The first test is simple
 
-    1> self() ! a.
-    a
+{% codeblock lang:erlang %}
+1> self() ! a.
+a
 
-    2> process_info(self()).
-     ...
-     {message_queue_len,1},
-     {messages,[a]},
-     ...
+2> process_info(self()).
+ ...
+ {message_queue_len,1},
+ {messages,[a]},
+ ...
 
-    3> receive a -> 1; b -> 2 end.
-    1
+3> receive a -> 1; b -> 2 end.
+1
 
-    4> process_info(self()).
-     ...
-     {message_queue_len,0},
-     {messages,[]},
-     ...
+4> process_info(self()).
+ ...
+ {message_queue_len,0},
+ {messages,[]},
+ ...
+{% endcodeblock %}
 
 We send a message to the shell, we see it in the process mailbox, then we receive it by matching, after which the queue is empty. Standard queue behaviour.
 
 For the next test we send three messages, and we match the last one
 
-    1> self() ! c, self() ! d, self() ! a.
-    a
+{% codeblock lang:erlang %}
+1> self() ! c, self() ! d, self() ! a.
+a
 
-    2> process_info(self()).
-     ...
-     {message_queue_len,3},
-     {messages,[c,d,a]},
-     ...
+2> process_info(self()).
+ ...
+ {message_queue_len,3},
+ {messages,[c,d,a]},
+ ...
 
-    3> receive a -> 1; b -> 2 end.
-    1
+3> receive a -> 1; b -> 2 end.
+1
 
-    4> process_info(self()).
-     ...
-     {message_queue_len,2},
-     {messages,[c,d]},
-     ...
+4> process_info(self()).
+ ...
+ {message_queue_len,2},
+ {messages,[c,d]},
+ ...
+{% endcodeblock %}
 
 Again, no surprises. In fact, this test demonstrates what people think when they hear about selective receive.
 
 Unfortunately we didn't see what happened internally between expressions 3 and 4. To find it out we need to modify the test. Let's start the shell in distributed mode so that we can connect to it later from the remote shell.
 
-    (foo@bar)1> register(shell, self()).
-    true
+{% codeblock lang:erlang %}
+(foo@bar)1> register(shell, self()).
+true
 
-    (foo@bar)2> shell ! c, shell ! d.
-    d
+(foo@bar)2> shell ! c, shell ! d.
+d
 
-    (foo@bar)3> process_info(whereis(shell)).
-     ...
-     {message_queue_len,2},
-     {messages,[c,d]},
-     ...
+(foo@bar)3> process_info(whereis(shell)).
+ ...
+ {message_queue_len,2},
+ {messages,[c,d]},
+ ...
 
-    (foo@bar)4> receive a -> 1; b -> 2 end.
+(foo@bar)4> receive a -> 1; b -> 2 end.
+{% endcodeblock %}
 
 At this moment the shell is suspended, exactly as described in step 4 of selective receive algorithm. Open remote shell, connect to the initial one, and type the following:
 
-    (foo@bar)1> process_info(whereis(shell)).
-     ...
-     {message_queue_len,0},
-     {messages,[]},
-     ...
+{% codeblock lang:erlang %}
+(foo@bar)1> process_info(whereis(shell)).
+ ...
+ {message_queue_len,0},
+ {messages,[]},
+ ...
+{% endcodeblock %}
 
 That's interesting: no messages in the mailbox! As Joe said, they are in the save queue. Now send a matching message:
 
-    (foo@bar)2> shell ! a.
-    a
+{% codeblock lang:erlang %}
+(foo@bar)2> shell ! a.
+a
+{% endcodeblock %}
 
 Go back to initial shell, which should be resumed now, and check the mailbox again:
 
-    1
-    (foo@bar)5> process_info(whereis(shell)).
-     ...
-     {message_queue_len,2},
-     {messages,[c,d]},
-     ...
+{% codeblock lang:erlang %}
+1
+(foo@bar)5> process_info(whereis(shell)).
+ ...
+ {message_queue_len,2},
+ {messages,[c,d]},
+ ...
+{% endcodeblock %}
 
 That's the same output we saw in the previous test, but now we know what happens behind the scene: *messages are moved from the mailbox to the save queue and then back to the mailbox after the matching message arrives*.
 
