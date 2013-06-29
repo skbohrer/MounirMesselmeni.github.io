@@ -2,10 +2,10 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://blog.ndpar.com
+url: http://MounirMesselmeni.github.io
 title: Side Notes
 subtitle: never finished…
-author: Andrey Paramonov
+author: Mounir Messelmeni
 simple_search: http://google.com/search
 description:
 
@@ -63,13 +63,13 @@ default_asides: [asides/recent_posts.html, asides/twitter.html, asides/github.ht
 # ----------------------- #
 
 # Github repositories
-github_user: ndpar
-github_repo_count: 4
-github_show_profile_link: false
+github_user: MounirMesselmeni
+github_repo_count: 0
+github_show_profile_link: true
 github_skip_forks: false
 
 # Twitter
-#twitter_user: ndpar
+#twitter_user: 
 #twitter_tweet_button: true
 
 # Google +1
