@@ -3,8 +3,8 @@
 # ----------------------- #
 
 url: http://MounirMesselmeni.github.io
-title: Side Notes
-subtitle: never finished…
+title: Awesome notes
+subtitle: We must learn to live together as brothers or perish together as fools. &#8220;Martin Luther King, Jr&#8220;
 author: Mounir Messelmeni
 simple_search: http://google.com/search
 description:
@@ -66,11 +66,11 @@ default_asides: [asides/recent_posts.html, asides/twitter.html, asides/github.ht
 github_user: MounirMesselmeni
 github_repo_count: 0
 github_show_profile_link: true
-github_skip_forks: false
+github_skip_forks: true
 
 # Twitter
 #twitter_user: 
-#twitter_tweet_button: true
+twitter_tweet_button: true
 
 # Google +1
 google_plus_one: false
@@ -90,11 +90,11 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: mounir-blog
+disqus_show_comment_count: true
 
 # Google Analytics
-#google_analytics_tracking_id: UA-6309596-5
+google_analytics_tracking_id: UA-42132208-1
 
 # Facebook Like
 facebook_like: false
