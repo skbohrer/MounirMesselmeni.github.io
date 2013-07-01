@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Stackoverflow API | Awesome notes]]></title>
+  <link href="http://MounirMesselmeni.github.io/categories/stackoverflow-api/atom.xml" rel="self"/>
+  <link href="http://MounirMesselmeni.github.io/"/>
+  <updated>2013-07-01T01:27:48+01:00</updated>
+  <id>http://MounirMesselmeni.github.io/</id>
+  <author>
+    <name><![CDATA[Mounir Messelmeni]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Simple AngularJS for Stackoverflow API]]></title>
+    <link href="http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api/"/>
+    <updated>2013-07-01T00:30:00+01:00</updated>
+    <id>http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api</id>
+    <content type="html"><![CDATA[<h1>Angular JS</h1>
+
+<p><a href="http://www.angularjs.org">AngularJS</a>&rsquo;s a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
+
+<p>There&rsquo;s many other Frameworks like <a href="http://backbonejs.org">Backbone.js</a>, <a href="http://emberjs.com">Ember.js</a>, <a href="http://knockoutjs.com">Knockout</a> &hellip;</p>
+
+<h2>Main concepts</h2>
+
+<ul>
+<li>Model: Application data</li>
+<li>View: What users sees</li>
+<li>Controller: Application behavior</li>
+<li>Scope: Glue between application data and behavior</li>
+<li><code>$</code>: Angular namespace</li>
+<li>Module: configure the injector</li>
+<li>Injector: assembles the application</li>
+</ul>
+
+
+<p>AngularJS offers two-way data binding without funcing up the model. You don&rsquo;t need to write a model like other javascript librairies.</p>
+
+<p><img class="center <a" src="href="http://docs.angularjs.org/img/One_Way_Data_Binding.png">http://docs.angularjs.org/img/One_Way_Data_Binding.png</a>">
+<img class="center <a" src="href="http://i.stack.imgur.com/KzDS3.png">http://i.stack.imgur.com/KzDS3.png</a>"></p>
+
+<p>Data-binding is an automatic way of updating the view whenever the model changes, as well as updating the model whenever the view changes. This is awesome because it eliminates DOM manipulation from the list of things you have to worry about. Source <a href="http://docs.angularjs.org/api">AngularJS doc</a></p>
+
+<p>Controllers are the behavior behind the DOM elements. AngularJS lets you express the behavior in a clean readable form without the usual boilerplate of updating the DOM, registering callbacks or watching model changes.</p>
+
+<p>A model for AngularJS is just a simple Javascript Object (JSON).
+This means, if we load a user from an API call, we can use it in html like he&rsquo;s structured from server. Magic!</p>
+
+<h2>How it works</h2>
+
+<ul>
+<li>Browser loads the HTML and then the AngularJS script.</li>
+<li>AngularJS wait for <code>DOMContentLoaded</code> event and looks for the <code>ng-app</code> directive.</li>
+<li>The module specified in <code>ng-app</code> is used to configure the injector.</li>
+<li>The injector is used to create the <code>$compile</code> service and <code>$rootScope</code>.</li>
+<li><code>$compile</code> compiles the DOM and links it with <code>$rootScope</code>.</li>
+</ul>
+
+
+<p><img class="center <a" src="href="http://docs.angularjs.org/img/guide/concepts-startup.png">http://docs.angularjs.org/img/guide/concepts-startup.png</a>"></p>
+
+<h1>Our first application with AngularJS</h1>
+
+<p>The goal of this section&rsquo;s to use AngularJS in a simple app, we are going to use <a href="http://api.stackexchange.com">Stack Exchange API V2.0 </a> just for demonstration purpose. I choose <a href="http://www.stackoverflow.com">Stackoverflow</a> simply because I like it and it&rsquo;s helpful for all of us.</p>
+
+<h2>Module</h2>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>controller.js </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="kd">var</span> <span class="nx">soApp</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;soApp&#39;</span><span class="p">,</span> <span class="p">[]);</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To create an AngularJS module, we just provide our module a name, in our case it&rsquo;s <code>soApp</code>.
+We use here an empty array, this array provides modules dependencies, all modules uses by our modules. We don&rsquo;t need this time.</p>
+
+<h2>Controller</h2>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>controller.js </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">soApp</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">lsquo</span><span class="p">;</span><span class="nx">MainController</span><span class="o">&amp;</span><span class="nx">rsquo</span><span class="p">;,</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="kd">function</span> <span class="nx">MainController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">//Controller behavior here</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To be continued</p>
+]]></content>
+  </entry>
+  
+</feed>
