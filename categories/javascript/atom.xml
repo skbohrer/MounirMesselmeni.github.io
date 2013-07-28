@@ -4,7 +4,7 @@
   <title><![CDATA[Category: javascript | Awesome notes]]></title>
   <link href="http://MounirMesselmeni.github.io/categories/javascript/atom.xml" rel="self"/>
   <link href="http://MounirMesselmeni.github.io/"/>
-  <updated>2013-07-01T01:29:06+01:00</updated>
+  <updated>2013-07-28T04:15:35+01:00</updated>
   <id>http://MounirMesselmeni.github.io/</id>
   <author>
     <name><![CDATA[Mounir Messelmeni]]></name>
@@ -20,7 +20,7 @@
     <id>http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api</id>
     <content type="html"><![CDATA[<h2>Angular JS</h2>
 
-<p><a href="http://www.angularjs.org">AngularJS</a>&rsquo;s a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
+<p><a href="http://www.angularjs.org">AngularJS</a> is a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
 
 <p>There&rsquo;s many other Frameworks like <a href="http://backbonejs.org">Backbone.js</a>, <a href="http://emberjs.com">Ember.js</a>, <a href="http://knockoutjs.com">Knockout</a> &hellip;</p>
 

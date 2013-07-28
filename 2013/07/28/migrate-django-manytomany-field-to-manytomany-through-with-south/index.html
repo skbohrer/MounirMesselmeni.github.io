@@ -1,24 +1,112 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Awesome notes]]></title>
-  <link href="http://MounirMesselmeni.github.io/atom.xml" rel="self"/>
-  <link href="http://MounirMesselmeni.github.io/"/>
-  <updated>2013-07-28T04:15:35+01:00</updated>
-  <id>http://MounirMesselmeni.github.io/</id>
-  <author>
-    <name><![CDATA[Mounir Messelmeni]]></name>
-    
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Migrate Django ManyToMany field to ManyToMany through with South - Awesome notes</title>
+  <meta name="author" content="Mounir Messelmeni">
 
   
-  <entry>
-    <title type="html"><![CDATA[Migrate Django ManyToMany field to ManyToMany through with South]]></title>
-    <link href="http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/"/>
-    <updated>2013-07-28T02:30:00+01:00</updated>
-    <id>http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south</id>
-    <content type="html"><![CDATA[<p>When working in a project already in production, you could encounter this case</p>
+  <meta name="description" content="migrate django manytomany field to manytomany through with south and import old data">
+  <meta name="keywords" content="django, south, manytomany, through, migration, data import">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Awesome notes" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-42132208-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Awesome notes</a></h1>
+  
+    <h2>We must learn to live together as brothers or perish together as fools. &#8220;Martin Luther King, Jr&#8220;</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:MounirMesselmeni.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About me</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Migrate Django ManyToMany Field to ManyToMany Through With South</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-28T02:30:00+01:00" pubdate data-updated="true">Jul 28<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>When working in a project already in production, you could encounter this case</p>
 
 <p>You have a model that contains a <code>ManyToMany</code> field without through model, Django in this case take care itself for the join table, it create a join table that contains three columns: ID, pk of model1 and pk of model2 with a unique together constraint. At a specific time you want to add new column to the join table. Alright, with <a href="http://south.readthedocs.org/en/latest/">South</a> installed you can do it easly but South doesn&rsquo;t import your old data it&rsquo;s just delete old table. How to import data from old schema to the new one?</p>
 
@@ -552,317 +640,174 @@ become</p>
 <p>Last thing, use South in your Django projects, <b>you must use it</b> from project start else from now!</p>
 
 <p>Good luck with your migrations !</p>
-]]></content>
-  </entry>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <entry>
-    <title type="html"><![CDATA[Simple AngularJS for Stackoverflow API]]></title>
-    <link href="http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api/"/>
-    <updated>2013-07-01T00:30:00+01:00</updated>
-    <id>http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api</id>
-    <content type="html"><![CDATA[<h2>Angular JS</h2>
 
-<p><a href="http://www.angularjs.org">AngularJS</a> is a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
+<span class="byline author vcard">Posted by <span class="fn">Mounir Messelmeni</span></span>
 
-<p>There&rsquo;s many other Frameworks like <a href="http://backbonejs.org">Backbone.js</a>, <a href="http://emberjs.com">Ember.js</a>, <a href="http://knockoutjs.com">Knockout</a> &hellip;</p>
-
-<h2>Main concepts</h2>
-
-<ul>
-<li>Model: Application data</li>
-<li>View: What users sees</li>
-<li>Controller: Application behavior</li>
-<li>Scope: Glue between application data and behavior</li>
-<li><code>$</code>: Angular namespace</li>
-<li>Module: configure the injector</li>
-<li>Injector: assembles the application</li>
-</ul>
+      
 
 
-<!-- more -->
 
 
-<p>AngularJS offers two-way data binding without funcing up the model. You don&rsquo;t need to write a model like other javascript librairies.</p>
-
-<p><img class="center" src="http://docs.angularjs.org/img/One_Way_Data_Binding.png">
-<img class="center" src="http://i.stack.imgur.com/KzDS3.png"></p>
-
-<p>Data-binding is an automatic way of updating the view whenever the model changes, as well as updating the model whenever the view changes. This is awesome because it eliminates DOM manipulation from the list of things you have to worry about. Source <a href="http://docs.angularjs.org/api">AngularJS doc</a></p>
-
-<p>Controllers are the behavior behind the DOM elements. AngularJS lets you express the behavior in a clean readable form without the usual boilerplate of updating the DOM, registering callbacks or watching model changes.</p>
-
-<p>A model for AngularJS is just a simple Javascript Object (JSON).
-This means, if we load a user from an API call, we can use it in html like he&rsquo;s structured from server. Magic!</p>
-
-<h2>How it works</h2>
-
-<ul>
-<li>Browser loads the HTML and then the AngularJS script.</li>
-<li>AngularJS wait for <code>DOMContentLoaded</code> event and looks for the <code>ng-app</code> directive.</li>
-<li>The module specified in <code>ng-app</code> is used to configure the injector.</li>
-<li>The injector is used to create the <code>$compile</code> service and <code>$rootScope</code>.</li>
-<li><code>$compile</code> compiles the DOM and links it with <code>$rootScope</code>.</li>
-</ul>
 
 
-<p><img class="center" src="http://docs.angularjs.org/img/guide/concepts-startup.png"></p>
-
-<h2>Our first application with AngularJS</h2>
-
-<p>The goal of this section&rsquo;s to use AngularJS in a simple app, we are going to use <a href="http://api.stackexchange.com">Stack Exchange API V2.0 </a> just for demonstration purpose. I choose <a href="http://www.stackoverflow.com">Stackoverflow</a> simply because I like it and it&rsquo;s helpful for all of us.</p>
-
-<h2>Module</h2>
-
-<figure class='code'><figcaption><span>controller.js </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>   <span class="kd">var</span> <span class="nx">soApp</span> <span class="o">=</span> <span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;soApp&#39;</span><span class="p">,</span> <span class="p">[]);</span>
-</span></code></pre></td></tr></table></div></figure>
 
 
-<p>To create an AngularJS module, we just provide our module a name, in our case it&rsquo;s <code>soApp</code>.
-We use here an empty array, this array provides modules dependencies, all modules uses by our modules. We don&rsquo;t need this time.</p>
-
-<h2>Controller</h2>
-
-<figure class='code'><figcaption><span>controller.js </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">soApp</span><span class="p">.</span><span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;MainController&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">MainController</span><span class="p">(</span><span class="nx">$scope</span><span class="p">){</span>
-</span><span class='line'>      <span class="c1">//Controller behavior here</span>
-</span><span class='line'>  <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To be continued</p>
-]]></content>
-  </entry>
   
-  <entry>
-    <title type="html"><![CDATA[Installing Sublime Text 3 on Fedora 19]]></title>
-    <link href="http://MounirMesselmeni.github.io/2013/06/30/installing-sublime-text-3-on-fedora-19/"/>
-    <updated>2013-06-30T16:03:00+01:00</updated>
-    <id>http://MounirMesselmeni.github.io/2013/06/30/installing-sublime-text-3-on-fedora-19</id>
-    <content type="html"><![CDATA[<p>To install sublime text on Fedora 19 (16, 17 and 18), download this gist</p>
-
-<p><a href="http://www.sublimetext.com/blog/articles/sublime-text-3-public-beta">Sublime Text 3</a> Beta is now open to non-registered users. <a href="http://www.sublimetext.com/3">Download</a> the tarball (32 or 64 bits).</p>
-
-<ul>
-<li>Go to your Downloads folder: <code>cd Downloads</code></li>
-<li>Download or copy this GIST in your Downloads folder.</li>
-<li>Execute this script by <code>chmod +x sublime3_fedora19.sh</code> and then <code>sudo ./sublime3_fedora19.sh sublime_text_3_build_3047_x64.tar.bz2</code>, <code>sublime_text_3_build_3047_x64.tar.bz2</code> is the downloaded tarball, change it if you download other version.</li>
-<li>Now your sublime text is installed and integrated to your gnome desktop.</li>
-</ul>
 
 
-<!-- more -->
+<time datetime="2013-07-28T02:30:00+01:00" pubdate data-updated="true">Jul 28<span>th</span>, 2013</time>
+      
 
-
-
-
-<div><script src='https://gist.github.com/5895264.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-
-<h2>Sublime Text 3 Package Control</h2>
-
-<p>To enable Package control in Sublime Text 3:</p>
-
-<ul>
-<li>Go into Sublime Text Packages : <code>cd ~/.config/sublime-text-3/Packages/</code></li>
-<li>Clone this repository: <code>git clone git://github.com/wbond/sublime_package_control.git Package\ Control</code></li>
-<li>Go into Package Control: <code>cd Package\ Control</code></li>
-<li>Checkout Python 3 branch: <code>git checkout python3</code></li>
-</ul>
-
-
-<p>Restart Sublime Text 3 and you should have Package Control working.</p>
-
-<p><a href="http://wbond.net/sublime_packages/package_control/installation#ST3">Source</a></p>
-
-<p><a href="https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages">Here&rsquo;s</a> the list of compatible plugins.</p>
-
-<h2>Sublime Text 3 Useful Shortcuts</h2>
-
-<div><script src='https://gist.github.com/5895595.js'></script>
-<noscript><pre><code></code></pre></noscript></div>
-
-
-
-]]></content>
-  </entry>
+<span class="categories">
   
-  <entry>
-    <title type="html"><![CDATA[Reading CSV File With Javascript and HTML5 File API]]></title>
-    <link href="http://MounirMesselmeni.github.io/2012/11/20/javascript-csv/"/>
-    <updated>2012-11-20T20:43:00+01:00</updated>
-    <id>http://MounirMesselmeni.github.io/2012/11/20/javascript-csv</id>
-    <content type="html"><![CDATA[<p>In a specific project, the client want to read a CSV file, process and show data into an <a href="http://openlayers.org/">OpenLayers</a> Map.</p>
-
-<p>So it come in my mind to write a simple html/javascript application, without any backend server.</p>
-
-<h2>How to read a file via browser ?</h2>
-
-<p>The unique constraint was how can I read the CSV file in browser.</p>
-
-<p>HTML5 finally provides a standard way to interact with local files, via the <a href="http://www.w3.org/TR/file-upload/">File API</a></p>
-
-<p>We are going to use <a href="http://dev.w3.org/2006/webapi/FileAPI/#dfn-filereader">FileReader</a></p>
-
-<!-- more -->
-
-
-<p>First, let’s check if the browser support FileReader API</p>
-
-<figure class='code'><figcaption><span>read-csv.js </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>   <span class="kd">function</span> <span class="nx">handleFiles</span><span class="p">(</span><span class="nx">files</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Check for the various File API support.</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">FileReader</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// FileReader are supported.</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;FileReader are not supported in this browser.&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>How to read a file via browser ?</h2>
-
-<p>To select a file we’re going to use a simple html <code>&lt;input type="file"&gt;</code></p>
-
-<p>We just call handleFile to make JavaScript returns the list of selected File objects but we are going to use only one.</p>
-
-<figure class='code'><figcaption><span>index.html </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'> <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;static/js/read-csv.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">id=</span><span class="s">&quot;csvFileInput&quot;</span> <span class="na">onchange=</span><span class="s">&quot;handleFiles(this.files)&quot;</span>
-</span><span class='line'>            <span class="na">accept=</span><span class="s">&quot;.csv&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Reading the File</h2>
-
-<p>After we’ve obtained a File reference, we instantiate a FileReader object to read its contents into memory. When the load finishes, the reader’s onload event is fired and its result attribute can be used to access the file data.</p>
-
-<p>FileReader includes four options for reading a file, asynchronously:
-&ndash; <code>FileReader.readAsBinaryString(Blob|File)</code> – The result property will contain the file/blob’s data as a binary string. Every byte is represented by an integer in the range [0..255].
-&ndash; <code>FileReader.readAsText(Blob|File, opt_encoding)</code> – The result property will contain the file/blob’s data as a text string. By default the string is decoded as ‘UTF-8’. Use the optional encoding parameter can specify a different format.
-&ndash; <code>FileReader.readAsDataURL(Blob|File)</code> – The result property will contain the file/blob’s data encoded as a data URL.
-&ndash; <code>FileReader.readAsArrayBuffer(Blob|File)</code> – The result property will contain the file/blob’s data as an ArrayBuffer object.</p>
-
-<p>For our example, we want to read a CSV file, so we can read it as text. And perfom data processing after in <code>processData(csv)</code> function.</p>
-
-<figure class='code'><figcaption><span>read-csv.js </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>   <span class="kd">function</span> <span class="nx">handleFiles</span><span class="p">(</span><span class="nx">files</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Check for the various File API support.</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">FileReader</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// FileReader are supported.</span>
-</span><span class='line'>        <span class="nx">getAsText</span><span class="p">(</span><span class="nx">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;FileReader are not supported in this browser.&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">getAsText</span><span class="p">(</span><span class="nx">fileToRead</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileReader</span><span class="p">();</span>
-</span><span class='line'>    <span class="c1">// Read file into memory as UTF-8      </span>
-</span><span class='line'>    <span class="nx">reader</span><span class="p">.</span><span class="nx">readAsText</span><span class="p">(</span><span class="nx">fileToRead</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Handle errors load</span>
-</span><span class='line'>    <span class="nx">reader</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="nx">loadHandler</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">reader</span><span class="p">.</span><span class="nx">onerror</span> <span class="o">=</span> <span class="nx">errorHandler</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">loadHandler</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">csv</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">result</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">processData</span><span class="p">(</span><span class="nx">csv</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">processData</span><span class="p">(</span><span class="nx">csv</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">allTextLines</span> <span class="o">=</span> <span class="nx">csv</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/\r\n|\n/</span><span class="p">);</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>      <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">allTextLines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">allTextLines</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">);</span>
-</span><span class='line'>              <span class="kd">var</span> <span class="nx">tarr</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>              <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">j</span><span class="o">&lt;</span><span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                  <span class="nx">tarr</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">data</span><span class="p">[</span><span class="nx">j</span><span class="p">]);</span>
-</span><span class='line'>              <span class="p">}</span>
-</span><span class='line'>              <span class="nx">lines</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tarr</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">lines</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">errorHandler</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">name</span> <span class="o">==</span> <span class="s2">&quot;NotReadableError&quot;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">alert</span><span class="p">(</span><span class="s2">&quot;Canno&#39;t read file !&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That’s it.</p>
-
-<h3>Resources</h3>
-
-<ul>
-<li><a href="https://github.com/MounirMesselmeni/html-fileapi">Source code</a> for this article.</li>
-</ul>
-
-]]></content>
-  </entry>
+    <a class='category' href='/categories/django/'>Django</a>, <a class='category' href='/categories/migration/'>Migration</a>, <a class='category' href='/categories/python/'>Python</a>, <a class='category' href='/categories/south/'>South</a>
   
-</feed>
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/" data-via="" data-counturl="http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2013/07/01/simple-angularjs-for-stackoverflow-api/" title="Previous Post: Simple AngularJS for Stackoverflow API">&laquo; Simple AngularJS for Stackoverflow API</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/">Migrate Django ManyToMany Field to ManyToMany Through With South</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/07/01/simple-angularjs-for-stackoverflow-api/">Simple AngularJS for Stackoverflow API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/06/30/installing-sublime-text-3-on-fedora-19/">Installing Sublime Text 3 on Fedora 19</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/11/20/javascript-csv/">Reading CSV File With Javascript and HTML5 File API</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/categories/angularjs/'>AngularJS (1)</a></li>
+<li class='category'><a href='/categories/django/'>Django (1)</a></li>
+<li class='category'><a href='/categories/fedora/'>Fedora (1)</a></li>
+<li class='category'><a href='/categories/migration/'>Migration (1)</a></li>
+<li class='category'><a href='/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/categories/south/'>South (1)</a></li>
+<li class='category'><a href='/categories/stackoverflow-api/'>Stackoverflow API (1)</a></li>
+<li class='category'><a href='/categories/sublime-text/'>Sublime Text (1)</a></li>
+<li class='category'><a href='/categories/csv/'>csv (1)</a></li>
+<li class='category'><a href='/categories/fileapi/'>fileapi (1)</a></li>
+<li class='category'><a href='/categories/html5/'>html5 (1)</a></li>
+<li class='category'><a href='/categories/javascript/'>javascript (2)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mounir Messelmeni -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mounir-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/';
+        var disqus_url = 'http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

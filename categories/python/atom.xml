@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Python | Awesome notes]]></title>
+  <link href="http://MounirMesselmeni.github.io/categories/python/atom.xml" rel="self"/>
+  <link href="http://MounirMesselmeni.github.io/"/>
+  <updated>2013-07-28T04:15:35+01:00</updated>
+  <id>http://MounirMesselmeni.github.io/</id>
+  <author>
+    <name><![CDATA[Mounir Messelmeni]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Migrate Django ManyToMany field to ManyToMany through with South]]></title>
+    <link href="http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/"/>
+    <updated>2013-07-28T02:30:00+01:00</updated>
+    <id>http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south</id>
+    <content type="html"><![CDATA[<p>When working in a project already in production, you could encounter this case</p>
+
+<p>You have a model that contains a <code>ManyToMany</code> field without through model, Django in this case take care itself for the join table, it create a join table that contains three columns: ID, pk of model1 and pk of model2 with a unique together constraint. At a specific time you want to add new column to the join table. Alright, with <a href="http://south.readthedocs.org/en/latest/">South</a> installed you can do it easly but South doesn&rsquo;t import your old data it&rsquo;s just delete old table. How to import data from old schema to the new one?</p>
+
+<!-- more -->
+
+
+<p>Let&rsquo;s make a concret example to be able to understand this case briefly.</p>
+
+<ul>
+<li>Create a Django project: <code>django-admin.py startproject migration_tutorial</code></li>
+<li>Go into project: <code>cd migration_tutorial</code></li>
+<li>Create a Django app named studies: <code>python manage.py startapp studies</code></li>
+<li>In <code>migration_tutorial/migration_tutorial/settings.py</code> change database config to sqlite and add studies to <code>INSTALLED_APPS</code></li>
+<li>We add also South to our <code>INSTALLED_APPS</code></li>
+</ul>
+
+
+<p>You should read <a href="http://south.readthedocs.org/en/latest/">South</a> documentation if you are not familiar with.</p>
+
+<p>Here&rsquo;s our changes in <code>settings.py</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>settings.py </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.postgresql_psycopg2&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="s">&#39;migration_tutorial&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;USER&#39;</span><span class="p">:</span> <span class="s">&#39;postgres&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;HOST&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s">&#39;PORT&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.sites&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.messages&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.staticfiles&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="s">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&#39;south&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">&#39;studies&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h2>Let&rsquo;s create our model</h2>
+
+<p>We are going to create a simple model for Professor, Student and Course application.</p>
+
+<ul>
+<li>A Professor teach many Students</li>
+<li>A Student is taught by many Professors</li>
+</ul>
+
+
+<p>So we have a ManyToMany relation between Students and Professors. Here&rsquo;s our Django model under the studies app</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>models.py </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Professor</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">last_name</span>  <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">last_name</span>  <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">professors</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Professor</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h2>Run the project</h2>
+
+<p>Alright, let&rsquo;s run our project:</p>
+
+<ul>
+<li>Init South Migration: <code>python manage.py schemamigration studies --init</code></li>
+<li>Sync Database: <code>python manage.py syncdb --noinput</code></li>
+<li>Migrate our app: <code>python manage.py migrate</code>, in this way South take care of schema creation</li>
+</ul>
+
+
+<p>Now, we are going to insert some data using shell:</p>
+
+<p>Enter in shell mode: <code>python manage.py shell</code></p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>python interactive shell </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">studies.models</span> <span class="kn">import</span> <span class="n">Professor</span><span class="p">,</span> <span class="n">Student</span>
+</span><span class='line'><span class="n">professor1</span> <span class="o">=</span> <span class="n">Professor</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Joshua</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span> <span class="n">last_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Smith</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">professor1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'><span class="n">professor2</span> <span class="o">=</span> <span class="n">Professor</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Ethan</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span> <span class="n">last_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Brown</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">professor2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Justin</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span> <span class="n">last_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Martin</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">student1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'><span class="n">student2</span> <span class="o">=</span> <span class="n">Student</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Tom</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;,</span> <span class="n">last_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Taylor</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">student2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Let</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">s</span> <span class="n">add</span> <span class="n">professor</span> <span class="mi">1</span> <span class="n">to</span> <span class="n">Student</span> <span class="n">one</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">student1</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">professor1</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Check</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="n">persisted</span> <span class="n">to</span> <span class="n">database</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Justin</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">student1</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Let</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="n">s</span> <span class="n">add</span> <span class="n">professor2</span> <span class="n">to</span> <span class="n">student1</span> <span class="n">too</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">student1</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">professor2</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Professor2</span> <span class="n">to</span> <span class="n">student2</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">student2</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">professor2</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Note that when working with Django ManyToManyField without through, Django provide some useful method like add method we just use.</p>
+
+<h2>Our migration case</h2>
+
+<p>Now think if we had this model in production, we have many Students and Professors relation stored in our database. At a specific time we want to add course name taught by Professor to a student, this is a join table column. We are going no to use a through model to add this attribute.</p>
+
+<p>Here&rsquo;s our updated models:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>models.py </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Professor</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">last_name</span>  <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">last_name</span>  <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">professors</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Professor</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s">&#39;Course&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Course</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">name</span>      <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</span><span class='line'><span class="n">professor</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Professor</span><span class="p">)</span>
+</span><span class='line'><span class="n">student</span>   <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Student</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">unique_together</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;professor&#39;</span><span class="p">,</span> <span class="s">&#39;student&#39;</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now, we are going to use South to migrate our schemas. Run <code>python manage.py schemamigration studies --auto</code>.</p>
+
+<p>South create a migration script under studies/migrations named <code>0002_auto__add_course__add_unique_course_professor_student.py</code></p>
+
+<p>Here&rsquo;s it:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>0002_auto<strong>add_course</strong>add_unique_course_professor_student.py </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;&amp;</span><span class="n">ndash</span><span class="p">;</span> <span class="n">coding</span><span class="p">:</span> <span class="n">utf</span><span class="o">-</span><span class="mi">8</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kn">import</span> <span class="nn">datetime</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">south.db</span> <span class="kn">import</span> <span class="n">db</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">south.v2</span> <span class="kn">import</span> <span class="n">SchemaMigration</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">SchemaMigration</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">forwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span>
+</span><span class='line'>    <span class="c"># Adding model &#39;Course&#39;</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">(</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">u&#39;id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">)(</span><span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">)(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;professor&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">)(</span><span class="n">to</span><span class="o">=</span><span class="n">orm</span><span class="p">[</span><span class="s">&#39;studies.Professor&#39;</span><span class="p">])),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;student&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">)(</span><span class="n">to</span><span class="o">=</span><span class="n">orm</span><span class="p">[</span><span class="s">&#39;studies.Student&#39;</span><span class="p">])),</span>
+</span><span class='line'>    <span class="p">))</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">send_create_signal</span><span class="p">(</span><span class="s">u&#39;studies&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Course&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Adding unique constraint on &#39;Course&#39;, fields [&#39;professor&#39;, &#39;student&#39;]</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_unique</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;professor_id&#39;</span><span class="p">,</span> <span class="s">&#39;student_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Removing M2M table for field professors on &#39;Student&#39;</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">delete_table</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">shorten_name</span><span class="p">(</span><span class="s">u&#39;studies_student_professors&#39;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">backwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span>
+</span><span class='line'>    <span class="c"># Removing unique constraint on &#39;Course&#39;, fields [&#39;professor&#39;, &#39;student&#39;]</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">delete_unique</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;professor_id&#39;</span><span class="p">,</span> <span class="s">&#39;student_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Deleting model &#39;Course&#39;</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">delete_table</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Adding M2M table for field professors on &#39;Student&#39;</span>
+</span><span class='line'>    <span class="n">m2m_table_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">shorten_name</span><span class="p">(</span><span class="s">u&#39;studies_student_professors&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">m2m_table_name</span><span class="p">,</span> <span class="p">(</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s">&#39;ID&#39;</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">auto_created</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;student&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">orm</span><span class="p">[</span><span class="s">u&#39;studies.student&#39;</span><span class="p">],</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;professor&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">orm</span><span class="p">[</span><span class="s">u&#39;studies.professor&#39;</span><span class="p">],</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">))</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_unique</span><span class="p">(</span><span class="n">m2m_table_name</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;student_id&#39;</span><span class="p">,</span> <span class="s">&#39;professor_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s">u&#39;studies.course&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;unique_together&#39;</span><span class="p">:</span> <span class="s">&quot;([&#39;professor&#39;, &#39;student&#39;],)&quot;</span><span class="p">,</span> <span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Course&#39;</span><span class="p">},</span>
+</span><span class='line'>        <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;professor&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Professor&#39;]&quot;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;student&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Student&#39;]&quot;</span><span class="p">})</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s">u&#39;studies.professor&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Professor&#39;</span><span class="p">},</span>
+</span><span class='line'>        <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">})</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s">u&#39;studies.student&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Student&#39;</span><span class="p">},</span>
+</span><span class='line'>        <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>        <span class="s">&#39;professors&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ManyToManyField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Professor&#39;]&quot;</span><span class="p">,</span> <span class="s">&#39;through&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Course&#39;]&quot;</span><span class="p">,</span> <span class="s">&#39;symmetrical&#39;</span><span class="p">:</span> <span class="s">&#39;False&#39;</span><span class="p">})</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">complete_apps</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;studies&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>There&rsquo;s two main methods:</p>
+
+<ul>
+<li>forwards: used to apply new changes</li>
+<li>backwards: used to revert new changes</li>
+</ul>
+
+
+<p>We are going now to add custom code to import existing relation into the new schema Course.
+For the attribute name in Course I&rsquo;m going to insert mathematics, in some case we need some details to know what we are going to put in the added column.</p>
+
+<p>We insert our custom code in the forwards method, it load data from old schema generated by Django and push it into the new schema Course.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>0002_auto<strong>add_course</strong>add_unique_course_professor_student.py </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">forwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>    <span class="c"># Adding model &#39;Course&#39;</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">(</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">u&#39;id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">)(</span><span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">)(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;professor&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">)(</span><span class="n">to</span><span class="o">=</span><span class="n">orm</span><span class="p">[</span><span class="s">&#39;studies.Professor&#39;</span><span class="p">])),</span>
+</span><span class='line'>        <span class="p">(</span><span class="s">&#39;student&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">)(</span><span class="n">to</span><span class="o">=</span><span class="n">orm</span><span class="p">[</span><span class="s">&#39;studies.Student&#39;</span><span class="p">])),</span>
+</span><span class='line'>    <span class="p">))</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">send_create_signal</span><span class="p">(</span><span class="s">u&#39;studies&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Course&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Adding unique constraint on &#39;Course&#39;, fields [&#39;professor&#39;, &#39;student&#39;]</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">create_unique</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;professor_id&#39;</span><span class="p">,</span> <span class="s">&#39;student_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">#Our custom code here, before delete_table and after create Course table</span>
+</span><span class='line'>    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">OldJoinMock</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+</span><span class='line'>        <span class="n">Course</span><span class="p">(</span><span class="n">student</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">student</span><span class="p">,</span> <span class="n">professor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">professor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;mathematics&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># Removing M2M table for field professors on &#39;Student&#39;</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">delete_table</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">shorten_name</span><span class="p">(</span><span class="s">u&#39;studies_student_professors&#39;</span><span class="p">))</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Run migration: <code>python manage.py migrate</code></p>
+
+<p>Let&rsquo;s check our data now:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>python interactive shell </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">studies.models</span> <span class="kn">import</span> <span class="n">Professor</span><span class="p">,</span> <span class="n">Student</span>
+</span><span class='line'><span class="n">student1</span> <span class="o">=</span> <span class="n">Student</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Justin</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">student1</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c">#should be professor1 and professor2&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Out</span><span class="p">:</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">Professor</span><span class="p">:</span> <span class="n">Joshua</span> <span class="n">Smith</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">Professor</span><span class="p">:</span> <span class="n">Ethan</span> <span class="n">Brown</span><span class="o">&gt;</span><span class="p">]</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">student2</span> <span class="o">=</span> <span class="n">Student</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">first_name</span><span class="o">=&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">Tom</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">student2</span><span class="o">.</span><span class="n">professors</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="c">#should be professor2&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Out</span><span class="p">:</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">Professor</span><span class="p">:</span> <span class="n">Ethan</span> <span class="n">Brown</span><span class="o">&gt;</span><span class="p">]</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Here&rsquo;s it, our relation are imported to our Course model easily. You can add also a custom code in backwards method needed for revert.</p>
+
+<p>Just don&rsquo;t forget to update your code because methods add and remove are not valid now:</p>
+
+<ul>
+<li>Add:
+<code>python
+student1.professors.add(professor1)
+</code>
+become
+<code>python
+Course(student=student1, professor=professor1, name='Django')
+</code></li>
+<li>Remove:
+<code>python
+student1.professors.remove(professor1)
+</code>
+become
+<code>python
+Course.objects.get(student=student1, professor=professor1).delete()
+</code></li>
+</ul>
+
+
+<p>Last thing, use South in your Django projects, <b>you must use it</b> from project start else from now!</p>
+
+<p>Good luck with your migrations !</p>
+]]></content>
+  </entry>
+  
+</feed>

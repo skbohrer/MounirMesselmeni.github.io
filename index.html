@@ -9,7 +9,7 @@
   <meta name="author" content="Mounir Messelmeni">
 
   
-  <meta name="description" content="Angular JS AngularJS&rsquo;s a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application &hellip;">
+  <meta name="description" content="When working in a project already in production, you could encounter this case You have a model that contains a ManyToMany field without through &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,51 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/">Migrate Django ManyToMany Field to ManyToMany Through With South</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-28T02:30:00+01:00" pubdate data-updated="true">Jul 28<span>th</span>, 2013</time>
+        
+         | <a href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>When working in a project already in production, you could encounter this case</p>
+
+<p>You have a model that contains a <code>ManyToMany</code> field without through model, Django in this case take care itself for the join table, it create a join table that contains three columns: ID, pk of model1 and pk of model2 with a unique together constraint. At a specific time you want to add new column to the join table. Alright, with <a href="http://south.readthedocs.org/en/latest/">South</a> installed you can do it easly but South doesn&rsquo;t import your old data it&rsquo;s just delete old table. How to import data from old schema to the new one?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2013/07/01/simple-angularjs-for-stackoverflow-api/">Simple AngularJS for Stackoverflow API</a></h1>
     
     
@@ -111,7 +156,7 @@
 
   <div class="entry-content"><h2>Angular JS</h2>
 
-<p><a href="http://www.angularjs.org">AngularJS</a>&rsquo;s a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
+<p><a href="http://www.angularjs.org">AngularJS</a> is a javascript and client side Framework. It expose a toolset based on extending the HTML vocabulary for your application.</p>
 
 <p>There&rsquo;s many other Frameworks like <a href="http://backbonejs.org">Backbone.js</a>, <a href="http://emberjs.com">Ember.js</a>, <a href="http://knockoutjs.com">Knockout</a> &hellip;</p>
 
@@ -258,6 +303,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/">Migrate Django ManyToMany Field to ManyToMany Through With South</a>
+      </li>
+    
+      <li class="post">
         <a href="/2013/07/01/simple-angularjs-for-stackoverflow-api/">Simple AngularJS for Stackoverflow API</a>
       </li>
     
@@ -280,7 +329,11 @@
   <h1>Categories</h1>
   <ul id="categories">
     <li class='category'><a href='/categories/angularjs/'>AngularJS (1)</a></li>
+<li class='category'><a href='/categories/django/'>Django (1)</a></li>
 <li class='category'><a href='/categories/fedora/'>Fedora (1)</a></li>
+<li class='category'><a href='/categories/migration/'>Migration (1)</a></li>
+<li class='category'><a href='/categories/python/'>Python (1)</a></li>
+<li class='category'><a href='/categories/south/'>South (1)</a></li>
 <li class='category'><a href='/categories/stackoverflow-api/'>Stackoverflow API (1)</a></li>
 <li class='category'><a href='/categories/sublime-text/'>Sublime Text (1)</a></li>
 <li class='category'><a href='/categories/csv/'>csv (1)</a></li>
