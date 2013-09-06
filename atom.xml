@@ -4,7 +4,7 @@
   <title><![CDATA[Awesome notes]]></title>
   <link href="http://MounirMesselmeni.github.io/atom.xml" rel="self"/>
   <link href="http://MounirMesselmeni.github.io/"/>
-  <updated>2013-07-28T04:15:35+01:00</updated>
+  <updated>2013-09-06T22:12:58+01:00</updated>
   <id>http://MounirMesselmeni.github.io/</id>
   <author>
     <name><![CDATA[Mounir Messelmeni]]></name>
@@ -670,19 +670,16 @@ We use here an empty array, this array provides modules dependencies, all module
 
 <p>To enable Package control in Sublime Text 3:</p>
 
-<ul>
-<li>Go into Sublime Text Packages : <code>cd ~/.config/sublime-text-3/Packages/</code></li>
-<li>Clone this repository: <code>git clone git://github.com/wbond/sublime_package_control.git Package\ Control</code></li>
-<li>Go into Package Control: <code>cd Package\ Control</code></li>
-<li>Checkout Python 3 branch: <code>git checkout python3</code></li>
-</ul>
+<p>The simplest method of installation is through the Sublime Text console. The console is accessed via the <code>ctrl+</code> shortcut or the View > Show Console menu. Once open, paste the following Python code for your version of Sublime Text into the console.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'>   <span class="kn">import</span> <span class="nn">urllib.request</span><span class="o">,</span><span class="nn">os</span><span class="p">;</span> <span class="n">pf</span> <span class="o">=</span> <span class="s">&#39;Package Control.sublime-package&#39;</span><span class="p">;</span> <span class="n">ipp</span> <span class="o">=</span> <span class="n">sublime</span><span class="o">.</span><span class="n">installed_packages_path</span><span class="p">();</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">install_opener</span><span class="p">(</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">ProxyHandler</span><span class="p">())</span> <span class="p">);</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ipp</span><span class="p">,</span> <span class="n">pf</span><span class="p">),</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span> <span class="s">&#39;http://sublime.wbond.net/&#39;</span> <span class="o">+</span> <span class="n">pf</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;%20&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Restart Sublime Text 3 and you should have Package Control working.</p>
+<p><a href="https://sublime.wbond.net/installation#st3">Source</a></p>
 
-<p><a href="http://wbond.net/sublime_packages/package_control/installation#ST3">Source</a></p>
-
-<p><a href="https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages">Here&rsquo;s</a> the list of compatible plugins.</p>
+<p><a href="https://sublime.wbond.net/browse">Here&rsquo;s</a> the list plugins with compatibility indicator.</p>
 
 <h2>Sublime Text 3 Useful Shortcuts</h2>
 
