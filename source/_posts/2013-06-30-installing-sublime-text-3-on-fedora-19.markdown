@@ -27,16 +27,15 @@ To install sublime text on Fedora 19 (16, 17 and 18), download this gist
 
 To enable Package control in Sublime Text 3:
 
-- Go into Sublime Text Packages : ``` cd ~/.config/sublime-text-3/Packages/ ```
-- Clone this repository: ```git clone git://github.com/wbond/sublime_package_control.git Package\ Control```
-- Go into Package Control: ```cd Package\ Control```
-- Checkout Python 3 branch: ```git checkout python3```
+The simplest method of installation is through the Sublime Text console. The console is accessed via the `ctrl+` shortcut or the View > Show Console menu. Once open, paste the following Python code for your version of Sublime Text into the console.
 
-Restart Sublime Text 3 and you should have Package Control working.
+{% codeblock lang:python %}
+	import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())
+{% endcodeblock %}
 
 [Source][3]
 
-[Here's][4] the list of compatible plugins.
+[Here's][4] the list plugins with compatibility indicator.
 
 ## Sublime Text 3 Useful Shortcuts
 
@@ -45,5 +44,5 @@ Restart Sublime Text 3 and you should have Package Control working.
 
 [1]: http://www.sublimetext.com/blog/articles/sublime-text-3-public-beta
 [2]: http://www.sublimetext.com/3
-[3]: http://wbond.net/sublime_packages/package_control/installation#ST3
-[4]: https://github.com/wbond/sublime_package_control/wiki/Sublime-Text-3-Compatible-Packages
+[3]: https://sublime.wbond.net/installation#st3
+[4]: https://sublime.wbond.net/browse
