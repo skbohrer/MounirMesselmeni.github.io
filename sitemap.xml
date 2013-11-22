@@ -2,44 +2,44 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://MounirMesselmeni.github.io/2012/11/20/javascript-csv/</loc>
-        <lastmod>2013-06-30T17:12:14+01:00</lastmod>
+        <lastmod>2013-09-22T17:57:02+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://MounirMesselmeni.github.io/2013/06/30/installing-sublime-text-3-on-fedora-19/
         </loc>
-        <lastmod>2013-09-06T22:12:57+01:00</lastmod>
+        <lastmod>2013-09-22T17:57:02+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://MounirMesselmeni.github.io/2013/07/01/simple-angularjs-for-stackoverflow-api/
         </loc>
-        <lastmod>2013-07-01T01:31:02+01:00</lastmod>
+        <lastmod>2013-09-22T17:57:02+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://MounirMesselmeni.github.io/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/
         </loc>
-        <lastmod>2013-07-28T04:15:35+01:00</lastmod>
+        <lastmod>2013-11-22T11:03:18+01:00</lastmod>
     </url>
     <url>
         <loc>http://MounirMesselmeni.github.io/robots.txt</loc>
-        <lastmod>2013-06-30T16:00:23+01:00</lastmod>
-    </url>
-    <url>
-        <loc>http://MounirMesselmeni.github.io/blog/archives/</loc>
-        <lastmod>2013-09-06T22:12:57+01:00</lastmod>
-    </url>
-    <url>
-        <loc>http://MounirMesselmeni.github.io/about/</loc>
-        <lastmod>2013-09-06T22:12:57+01:00</lastmod>
-    </url>
-    <url>
-        <loc>http://MounirMesselmeni.github.io/</loc>
-        <lastmod>2013-09-06T22:12:57+01:00</lastmod>
+        <lastmod>2013-09-22T17:57:02+01:00</lastmod>
     </url>
     <url>
         <loc>http://MounirMesselmeni.github.io/archives/</loc>
-        <lastmod>2013-09-06T22:12:57+01:00</lastmod>
+        <lastmod>2013-11-22T11:03:18+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://MounirMesselmeni.github.io/blog/archives/</loc>
+        <lastmod>2013-11-22T11:03:18+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://MounirMesselmeni.github.io/</loc>
+        <lastmod>2013-11-22T11:03:18+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://MounirMesselmeni.github.io/about/</loc>
+        <lastmod>2013-11-22T11:03:18+01:00</lastmod>
     </url>
 </urlset>

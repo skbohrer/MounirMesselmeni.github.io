@@ -4,7 +4,7 @@
   <title><![CDATA[Awesome notes]]></title>
   <link href="http://MounirMesselmeni.github.io/atom.xml" rel="self"/>
   <link href="http://MounirMesselmeni.github.io/"/>
-  <updated>2013-09-06T22:12:58+01:00</updated>
+  <updated>2013-11-22T11:05:42+01:00</updated>
   <id>http://MounirMesselmeni.github.io/</id>
   <author>
     <name><![CDATA[Mounir Messelmeni]]></name>
@@ -466,7 +466,95 @@ For the attribute name in Course I&rsquo;m going to insert mathematics, in some 
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
 <span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">forwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># -*- coding: utf-8 -*-</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">south.utils</span> <span class="kn">import</span> <span class="n">datetime_utils</span> <span class="k">as</span> <span class="n">datetime</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">south.db</span> <span class="kn">import</span> <span class="n">db</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">south.v2</span> <span class="kn">import</span> <span class="n">SchemaMigration</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">studies.models</span> <span class="kn">import</span> <span class="n">Student</span><span class="p">,</span> <span class="n">Professor</span><span class="p">,</span> <span class="n">Course</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">OldJoinMock</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">db_table</span> <span class="o">=</span> <span class="s">u&#39;studies_student_professors&#39;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">student</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Student</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">professor</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Professor</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Migration</span><span class="p">(</span><span class="n">SchemaMigration</span><span class="p">):</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">forwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span>
 </span><span class='line'>        <span class="c"># Adding model &#39;Course&#39;</span>
 </span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">(</span>
 </span><span class='line'>            <span class="p">(</span><span class="s">u&#39;id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gf</span><span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">)(</span><span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
@@ -478,13 +566,61 @@ For the attribute name in Course I&rsquo;m going to insert mathematics, in some 
 </span><span class='line'>
 </span><span class='line'>        <span class="c"># Adding unique constraint on &#39;Course&#39;, fields [&#39;professor&#39;, &#39;student&#39;]</span>
 </span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">create_unique</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;professor_id&#39;</span><span class="p">,</span> <span class="s">&#39;student_id&#39;</span><span class="p">])</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c">#Our custom code here, before delete_table and after create Course table</span>
-</span><span class='line'>        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">OldJoinMock</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-</span><span class='line'>            <span class="n">Course</span><span class="p">(</span><span class="n">student</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">student</span><span class="p">,</span> <span class="n">professor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">professor</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;mathematics&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</span><span class='line'>      
+</span><span class='line'>      <span class="c">#Our custom code here, before delete_table and after create Course table</span>
+</span><span class='line'>        <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">bulk_create</span><span class="p">([</span>
+</span><span class='line'>            <span class="n">Course</span><span class="p">(</span>
+</span><span class='line'>                <span class="n">student</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">student</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">professor</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">professor</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">name</span><span class="o">=</span><span class="s">&#39;mathematics&#39;</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">OldJoinMock</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">])</span>
 </span><span class='line'>
 </span><span class='line'>        <span class="c"># Removing M2M table for field professors on &#39;Student&#39;</span>
 </span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">delete_table</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">shorten_name</span><span class="p">(</span><span class="s">u&#39;studies_student_professors&#39;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">backwards</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orm</span><span class="p">):</span>
+</span><span class='line'>        <span class="c"># Removing unique constraint on &#39;Course&#39;, fields [&#39;professor&#39;, &#39;student&#39;]</span>
+</span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">delete_unique</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;professor_id&#39;</span><span class="p">,</span> <span class="s">&#39;student_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c"># Deleting model &#39;Course&#39;</span>
+</span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">delete_table</span><span class="p">(</span><span class="s">u&#39;studies_course&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c"># Adding M2M table for field professors on &#39;Student&#39;</span>
+</span><span class='line'>        <span class="n">m2m_table_name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">shorten_name</span><span class="p">(</span><span class="s">u&#39;studies_student_professors&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">m2m_table_name</span><span class="p">,</span> <span class="p">(</span>
+</span><span class='line'>            <span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s">&#39;ID&#39;</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">auto_created</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
+</span><span class='line'>            <span class="p">(</span><span class="s">&#39;student&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">orm</span><span class="p">[</span><span class="s">u&#39;studies.student&#39;</span><span class="p">],</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">)),</span>
+</span><span class='line'>            <span class="p">(</span><span class="s">&#39;professor&#39;</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">orm</span><span class="p">[</span><span class="s">u&#39;studies.professor&#39;</span><span class="p">],</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">))</span>
+</span><span class='line'>        <span class="n">db</span><span class="o">.</span><span class="n">create_unique</span><span class="p">(</span><span class="n">m2m_table_name</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;student_id&#39;</span><span class="p">,</span> <span class="s">&#39;professor_id&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s">u&#39;studies.course&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;unique_together&#39;</span><span class="p">:</span> <span class="s">&quot;([&#39;professor&#39;, &#39;student&#39;],)&quot;</span><span class="p">,</span> <span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Course&#39;</span><span class="p">},</span>
+</span><span class='line'>            <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;professor&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Professor&#39;]&quot;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;student&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ForeignKey&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Student&#39;]&quot;</span><span class="p">})</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="s">u&#39;studies.professor&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Professor&#39;</span><span class="p">},</span>
+</span><span class='line'>            <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">})</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="s">u&#39;studies.student&#39;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="s">&#39;Meta&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;object_name&#39;</span><span class="p">:</span> <span class="s">&#39;Student&#39;</span><span class="p">},</span>
+</span><span class='line'>            <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">u&#39;id&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.AutoField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;primary_key&#39;</span><span class="p">:</span> <span class="s">&#39;True&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.CharField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;max_length&#39;</span><span class="p">:</span> <span class="s">&#39;50&#39;</span><span class="p">}),</span>
+</span><span class='line'>            <span class="s">&#39;professors&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s">&#39;django.db.models.fields.related.ManyToManyField&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;to&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Professor&#39;]&quot;</span><span class="p">,</span> <span class="s">&#39;through&#39;</span><span class="p">:</span> <span class="s">u&quot;orm[&#39;studies.Course&#39;]&quot;</span><span class="p">,</span> <span class="s">&#39;symmetrical&#39;</span><span class="p">:</span> <span class="s">&#39;False&#39;</span><span class="p">})</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">complete_apps</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;studies&#39;</span><span class="p">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
