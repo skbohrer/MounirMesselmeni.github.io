@@ -4,8 +4,8 @@ title:      "Reading CSV File With Javascript and HTML5 File API"
 date:       2012-11-20 20:43
 categories: [javascript,csv,fileapi,html5]
 published:  true
-keywords: javascript, csv, fileapi, html5
-description: How to read a file via html5 and javascript
+keywords: javascript, csv, fileapi, html5, read, file, html, js, api, file api
+description: How to read a file via html5 and javascript, using modern browsers to instantly view and parse data in client side.
 ---
 
 In a specific project, the client want to read a CSV file, process and show data into an [OpenLayers][1] Map.
@@ -46,7 +46,7 @@ We just call handleFile to make JavaScript returns the list of selected File obj
 {% codeblock index.html lang:html %}
 	<script type="text/javascript" src="static/js/read-csv.js"></script>
   	<input type="file" id="csvFileInput" onchange="handleFiles(this.files)"
-            accept=".csv"></div>
+            accept=".csv">
 {% endcodeblock %}
 
 ##Reading the File

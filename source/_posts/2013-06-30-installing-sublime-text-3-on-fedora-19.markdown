@@ -5,7 +5,7 @@ date: 2013-06-30 16:03
 comments: true
 categories: [Sublime Text,Fedora]
 
-keywords: sublime text, fedora, package control, sublime text shortcuts
+keywords: sublime text, fedora, package control, sublime text shortcuts, install, sublimetext, sublimetext3, gnome, gnome 3, sublime text, shortcuts
 description: install sublime text on Fedora 19, install package control, useful shortcuts
 ---
 

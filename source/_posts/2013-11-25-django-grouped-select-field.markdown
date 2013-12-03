@@ -4,7 +4,7 @@ title: "Django grouped select field for ModelChoiceField or ModelMultipleChoiceF
 date: 2013-11-25 11:08
 comments: true
 categories: [Django, Python, Custom Fields]
-keywords: django, select, grouped, custom fields, ModelChoiceField, ModelMultipleChoiceField, groped select
+keywords: django, select, grouped, custom fields, ModelChoiceField, ModelMultipleChoiceField, grouped select, groupe choices, choices, field
 description: create django grouped select field for ModelChoiceField or ModelMultipleChoiceField
 ---
 

@@ -5,7 +5,7 @@ date: 2013-07-28 02:30
 comments: true
 categories: [Django, South, Migration, Python]
 
-keywords: django, south, manytomany, through, migration, data import
+keywords: django, south, manytomany, through, migration, data import, table, orm, m2m
 description: migrate django manytomany field to manytomany through with south and import old data
 ---
 
