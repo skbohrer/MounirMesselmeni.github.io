@@ -4,7 +4,7 @@
   <title><![CDATA[Awesome notes]]></title>
   <link href="http://MounirMesselmeni.github.io/atom.xml" rel="self"/>
   <link href="http://MounirMesselmeni.github.io/"/>
-  <updated>2013-11-25T17:10:22+01:00</updated>
+  <updated>2013-12-03T01:36:10+01:00</updated>
   <id>http://MounirMesselmeni.github.io/</id>
   <author>
     <name><![CDATA[Mounir Messelmeni]]></name>
@@ -12,6 +12,177 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Install vsftpd on Linux and configure nginx as webserver]]></title>
+    <link href="http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/"/>
+    <updated>2013-12-03T00:49:00+01:00</updated>
+    <id>http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver</id>
+    <content type="html"><![CDATA[<p>In this tutorial we will create an FTP server in Redhat based distribution(Fedora, CentOS, Amazon Linux AMI, Redhat), this tutorial also can be applied for others distibution like Ubuntu or Debian, just change some configuration file location and some commands syntax.</p>
+
+<p>We will install <a href="https://security.appspot.com/vsftpd.html">VSFTPD</a> and <a href="http://nginx.com/">Nginx</a> to dispose uploaded data via FTP with Nginx.</p>
+
+<!-- more -->
+
+
+<h3>VSFTPD Installation</h3>
+
+<p>First of all, let&rsquo;s install vsftpd, an awesome FTP server very simple to use.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo yum install vsftpd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, let&rsquo;s copy this configuration into <code>/etc/vsftpd/vsftpd.conf</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>anonymous_enable=NO
+</span><span class='line'>local_enable=YES
+</span><span class='line'>write_enable=YES
+</span><span class='line'>local_umask=022
+</span><span class='line'>dirmessage_enable=YES
+</span><span class='line'>xferlog_enable=YES
+</span><span class='line'>connect_from_port_20=NO
+</span><span class='line'>xferlog_file=/var/log/vsftpd/vsftpd.log
+</span><span class='line'>xferlog_std_format=YES
+</span><span class='line'>ftpd_banner=Welcome to FTP service
+</span><span class='line'>chroot_local_user=YES
+</span><span class='line'>listen=YES
+</span><span class='line'>pam_service_name=vsftpd
+</span><span class='line'>tcp_wrappers=YES
+</span><span class='line'>userlist_file=/etc/vsftpd/vsftpd.userlist
+</span><span class='line'>userlist_enable=YES
+</span><span class='line'>userlist_deny=NO
+</span><span class='line'>pasv_max_port=51000
+</span><span class='line'>pasv_min_port=50000
+</span><span class='line'>port_enable=YES
+</span><span class='line'>pasv_enable=YES
+</span><span class='line'>pasv_address=YOUR_SERVER_URL
+</span><span class='line'>pasv_addr_resolve=YES
+</span><span class='line'>check_shell=NO
+</span><span class='line'>passwd_chroot_enable=YES</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you see, in this configuration we had edited this settings:</p>
+
+<ul>
+<li>Disabling anonymous connections: <code>anonymous_enable=NO</code></li>
+<li>Creating a custom log folder: <code>/var/log/vsftpd/vsftpd.log</code></li>
+<li>Activating the custom log: <code>xferlog_std_format=YES</code></li>
+<li>Adding a custom welcome message to our FTP Server: <code>ftpd_banner=Welcome to FTP service</code></li>
+<li>Enabling local users: <code>userlist_enable=YES</code></li>
+<li>Specifying users list: <code>userlist_file=/etc/vsftpd/vsftpd.userlist</code></li>
+<li>Enabling users list: <code>userlist_enable=YES</code></li>
+<li>Specifying users list as authorized list: <code>userlist_deny=NO</code></li>
+<li>The ftpuser should be able to write data: <code>write_enable=YES</code></li>
+<li>Set umask to 022 to make sure that all the files (644) and folders (755) you upload get the proper permissions: <code>local_umask=022</code></li>
+<li>Configure vsftpd to use ports 50000-51000 for passive data transfers</li>
+<li>Change <code>YOUR_SERVER_URL</code> with the IP or domain name server, if you use IP you can change <code>pasv_addr_resolve</code> to <code>NO</code></li>
+</ul>
+
+
+<p>Next, we should create the folder where data should be, make this folder the home directory of the ftp user we will create. And define a password for this user.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mkdir -p /var/log/vsftpd/
+</span><span class='line'>sudo mkdir -p /var/www/ftp
+</span><span class='line'>sudo useradd -d /var/www/ftp/ -s /sbin/nologin ftp_user
+</span><span class='line'>sudo passwd ftp_user
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, we add this user in the authorized users list, create a group named ftpusers and affect it to the ftp_user and make ftp_user own the ftp directory.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo <span class="nb">echo</span> <span class="s2">&quot;ftp_user&quot;</span> &gt; /etc/vsftpd/vsftpd.userlist
+</span><span class='line'>sudo groupadd ftpusers
+</span><span class='line'>sudo usermod -G ftpusers ftp_user
+</span><span class='line'>sudo chown ftp_user /var/www/ftp/ -R
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our Vsftpd server need to be restarted, we can also add it to start on boot with <code>chkconfig</code>, just update your firewall configuration to add the port 21/tcp and port range 50000-51000/tcp.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chkconfig vsftpd on
+</span><span class='line'>sudo service vsftpd restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can test your server with ftp command or FileZilla client.</p>
+
+<h3>Nginx Installation</h3>
+
+<p>Let&rsquo;s install and configure Nginx to dispose our uploaded FTP data (HTML, Images, &hellip;).</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo yum install vsftpd
+</span><span class='line'>sudo chkconfig nginx --add
+</span><span class='line'>sudo chkconfig nginx on --level 235
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, copy the following configuration into <code>/etc/nginx/conf.d/ftp.conf</code> and start nginx service <code>sudo service nginx start</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server {
+</span><span class='line'>  listen        80;
+</span><span class='line'>  server_name   domain;
+</span><span class='line'>
+</span><span class='line'>  location /{
+</span><span class='line'>    autoindex on;
+</span><span class='line'>    root  /var/www/ftp/;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, don&rsquo;t forget to add port 80 rule to your firewall configuration.</p>
+
+<p>That&rsquo;s all !</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Django grouped select field for ModelChoiceField or ModelMultipleChoiceField]]></title>

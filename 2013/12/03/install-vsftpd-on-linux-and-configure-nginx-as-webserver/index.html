@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Install vsftpd on Linux and configure nginx as webserver - Awesome notes</title>
+  <meta name="author" content="Mounir Messelmeni">
+
+  
+  <meta name="description" content="How to install an ftp server on linux using Vsftpd and dispose uploaded content on the web via nginx. Using a redhat based distribution like fedora, &hellip;">
+  <meta name="keywords" content="Linux, Fedora, redhat, amazon linux, amazon linux ami, vsftp, vsftpd, nginx, web server, ftp, html, debian, ubuntu, amazon, aws, ec2, ami">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Awesome notes" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-42132208-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Awesome notes</a></h1>
+  
+    <h2>We must learn to live together as brothers or perish together as fools. &#8220;Martin Luther King, Jr&#8220;</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:MounirMesselmeni.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About me</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Install Vsftpd on Linux and Configure Nginx as Webserver</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-03T00:49:00+01:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this tutorial we will create an FTP server in Redhat based distribution(Fedora, CentOS, Amazon Linux AMI, Redhat), this tutorial also can be applied for others distibution like Ubuntu or Debian, just change some configuration file location and some commands syntax.</p>
+
+<p>We will install <a href="https://security.appspot.com/vsftpd.html">VSFTPD</a> and <a href="http://nginx.com/">Nginx</a> to dispose uploaded data via FTP with Nginx.</p>
+
+<!-- more -->
+
+
+<h3>VSFTPD Installation</h3>
+
+<p>First of all, let&rsquo;s install vsftpd, an awesome FTP server very simple to use.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo yum install vsftpd
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, let&rsquo;s copy this configuration into <code>/etc/vsftpd/vsftpd.conf</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>anonymous_enable=NO
+</span><span class='line'>local_enable=YES
+</span><span class='line'>write_enable=YES
+</span><span class='line'>local_umask=022
+</span><span class='line'>dirmessage_enable=YES
+</span><span class='line'>xferlog_enable=YES
+</span><span class='line'>connect_from_port_20=NO
+</span><span class='line'>xferlog_file=/var/log/vsftpd/vsftpd.log
+</span><span class='line'>xferlog_std_format=YES
+</span><span class='line'>ftpd_banner=Welcome to FTP service
+</span><span class='line'>chroot_local_user=YES
+</span><span class='line'>listen=YES
+</span><span class='line'>pam_service_name=vsftpd
+</span><span class='line'>tcp_wrappers=YES
+</span><span class='line'>userlist_file=/etc/vsftpd/vsftpd.userlist
+</span><span class='line'>userlist_enable=YES
+</span><span class='line'>userlist_deny=NO
+</span><span class='line'>pasv_max_port=51000
+</span><span class='line'>pasv_min_port=50000
+</span><span class='line'>port_enable=YES
+</span><span class='line'>pasv_enable=YES
+</span><span class='line'>pasv_address=YOUR_SERVER_URL
+</span><span class='line'>pasv_addr_resolve=YES
+</span><span class='line'>check_shell=NO
+</span><span class='line'>passwd_chroot_enable=YES</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you see, in this configuration we had edited this settings:</p>
+
+<ul>
+<li>Disabling anonymous connections: <code>anonymous_enable=NO</code></li>
+<li>Creating a custom log folder: <code>/var/log/vsftpd/vsftpd.log</code></li>
+<li>Activating the custom log: <code>xferlog_std_format=YES</code></li>
+<li>Adding a custom welcome message to our FTP Server: <code>ftpd_banner=Welcome to FTP service</code></li>
+<li>Enabling local users: <code>userlist_enable=YES</code></li>
+<li>Specifying users list: <code>userlist_file=/etc/vsftpd/vsftpd.userlist</code></li>
+<li>Enabling users list: <code>userlist_enable=YES</code></li>
+<li>Specifying users list as authorized list: <code>userlist_deny=NO</code></li>
+<li>The ftpuser should be able to write data: <code>write_enable=YES</code></li>
+<li>Set umask to 022 to make sure that all the files (644) and folders (755) you upload get the proper permissions: <code>local_umask=022</code></li>
+<li>Configure vsftpd to use ports 50000-51000 for passive data transfers</li>
+<li>Change <code>YOUR_SERVER_URL</code> with the IP or domain name server, if you use IP you can change <code>pasv_addr_resolve</code> to <code>NO</code></li>
+</ul>
+
+
+<p>Next, we should create the folder where data should be, make this folder the home directory of the ftp user we will create. And define a password for this user.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo mkdir -p /var/log/vsftpd/
+</span><span class='line'>sudo mkdir -p /var/www/ftp
+</span><span class='line'>sudo useradd -d /var/www/ftp/ -s /sbin/nologin ftp_user
+</span><span class='line'>sudo passwd ftp_user
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, we add this user in the authorized users list, create a group named ftpusers and affect it to the ftp_user and make ftp_user own the ftp directory.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo <span class="nb">echo</span> <span class="s2">&quot;ftp_user&quot;</span> &gt; /etc/vsftpd/vsftpd.userlist
+</span><span class='line'>sudo groupadd ftpusers
+</span><span class='line'>sudo usermod -G ftpusers ftp_user
+</span><span class='line'>sudo chown ftp_user /var/www/ftp/ -R
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our Vsftpd server need to be restarted, we can also add it to start on boot with <code>chkconfig</code>, just update your firewall configuration to add the port 21/tcp and port range 50000-51000/tcp.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo chkconfig vsftpd on
+</span><span class='line'>sudo service vsftpd restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can test your server with ftp command or FileZilla client.</p>
+
+<h3>Nginx Installation</h3>
+
+<p>Let&rsquo;s install and configure Nginx to dispose our uploaded FTP data (HTML, Images, &hellip;).</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo yum install vsftpd
+</span><span class='line'>sudo chkconfig nginx --add
+</span><span class='line'>sudo chkconfig nginx on --level 235
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, copy the following configuration into <code>/etc/nginx/conf.d/ftp.conf</code> and start nginx service <code>sudo service nginx start</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>server {
+</span><span class='line'>  listen        80;
+</span><span class='line'>  server_name   domain;
+</span><span class='line'>
+</span><span class='line'>  location /{
+</span><span class='line'>    autoindex on;
+</span><span class='line'>    root  /var/www/ftp/;
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, don&rsquo;t forget to add port 80 rule to your firewall configuration.</p>
+
+<p>That&rsquo;s all !</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mounir Messelmeni</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-03T00:49:00+01:00" pubdate data-updated="true">Dec 3<span>rd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/categories/linux/'>Linux</a>, <a class='category' href='/categories/nginx/'>Nginx</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/" data-via="" data-counturl="http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2013/11/25/django-grouped-select-field/" title="Previous Post: Django grouped select field for ModelChoiceField or ModelMultipleChoiceField">&laquo; Django grouped select field for ModelChoiceField or ModelMultipleChoiceField</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/">Install Vsftpd on Linux and Configure Nginx as Webserver</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/11/25/django-grouped-select-field/">Django Grouped Select Field for ModelChoiceField or ModelMultipleChoiceField</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/07/28/migrate-django-manytomany-field-to-manytomany-through-with-south/">Migrate Django ManyToMany Field to ManyToMany Through With South</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/07/01/simple-angularjs-for-stackoverflow-api/">Simple AngularJS for Stackoverflow API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/06/30/installing-sublime-text-3-on-fedora-19/">Installing Sublime Text 3 on Fedora 19</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+<section>
+  <h1>Categories</h1>
+  <ul id="categories">
+    <li class='category'><a href='/categories/angularjs/'>AngularJS (1)</a></li>
+<li class='category'><a href='/categories/custom-fields/'>Custom Fields (1)</a></li>
+<li class='category'><a href='/categories/django/'>Django (2)</a></li>
+<li class='category'><a href='/categories/fedora/'>Fedora (1)</a></li>
+<li class='category'><a href='/categories/linux/'>Linux (1)</a></li>
+<li class='category'><a href='/categories/migration/'>Migration (1)</a></li>
+<li class='category'><a href='/categories/nginx/'>Nginx (1)</a></li>
+<li class='category'><a href='/categories/python/'>Python (2)</a></li>
+<li class='category'><a href='/categories/south/'>South (1)</a></li>
+<li class='category'><a href='/categories/stackoverflow-api/'>Stackoverflow API (1)</a></li>
+<li class='category'><a href='/categories/sublime-text/'>Sublime Text (1)</a></li>
+<li class='category'><a href='/categories/csv/'>csv (1)</a></li>
+<li class='category'><a href='/categories/fileapi/'>fileapi (1)</a></li>
+<li class='category'><a href='/categories/html5/'>html5 (1)</a></li>
+<li class='category'><a href='/categories/javascript/'>javascript (2)</a></li>
+
+  </ul>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mounir Messelmeni -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mounir-blog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/';
+        var disqus_url = 'http://MounirMesselmeni.github.io/2013/12/03/install-vsftpd-on-linux-and-configure-nginx-as-webserver/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
